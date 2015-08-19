@@ -1,0 +1,46 @@
+#!/bin/zsh
+
+# crappy.
+function killem() {
+  killall ii monop
+}
+
+# one at a time.
+killem
+trap killem INT
+
+# where ii puts his shit
+prefix=$HOME/monop-irc
+
+rm -rf $prefix
+mkdir $prefix
+
+server=irc.oftc.net
+channel=\#monop
+nick=monop
+
+ii -s $server -n $nick -i $prefix &
+echo $! > $prefix/pid
+
+
+in=$prefix/$server/in
+out=$prefix/$server/out
+outchan=$prefix/$server/$channel/out
+inchan=$prefix/$server/$channel/in
+monop=$HOME/bin/monop
+
+# wait for the connection to be ready
+while [ ! -p $in ]; do sleep 1 ; done
+
+echo '/j #monop' >> $in
+
+# wait for the channel to be ready
+while [ ! -p $inchan ]; do sleep 1 ; done
+echo "Shall We Play A Game?" > $inchan
+echo 'Prefix your commands with a dot ``.'"''" > $inchan
+while [ ! -f $outchan ]; do sleep 1 ; done
+
+
+tail -f $outchan |  sed -u -En 's/[0-9-]+ [0-9:]+ <([a-z_]+)> \.(.*)$/\1 \2/p' | grep --line-buffered -v "^${nick} " | { while true ; do  $monop ; done } > $inchan
+
+killem
