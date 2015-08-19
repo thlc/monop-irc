@@ -1,0 +1,5 @@
+Makeconfig:	Makeconfig.in subst.sed substscr
+	./substscr g h Makeconfig.in Makeconfig
+
+monop/pathnames.h:	monop/pathnames.h.in subst.sed substscr
+	./substscr g c monop/pathnames.h.in monop/pathnames.h

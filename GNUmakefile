@@ -1,7 +1,11 @@
 .PHONY:	monop
 all:	monop
 
+include Makeconfig
+# Include substitution rules.
+include subst.rules
 include monop/Makefrag
+
 monop/%.o:	monop/%.c
 	$(CC) $(CFLAGS) $(monop_CFLAGS) $(monop_DEFS) $(BASE_INCS) -Imonop $(monop_INCS) -c $< -o $@
 monop/%.i:	monop/%.c
